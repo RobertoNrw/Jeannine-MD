@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QPR Ambulante Pflege – Prüfinstrument MD Bund (Teil 1a, ab 01.07.2026)</title>
+<style>
+  :root {
+    --blau: #003366;
+    --blau-mid: #004a8f;
+    --blau-hell: #e8f0fa;
+    --gruen: #1a7a4a;
+    --gruen-hell: #e6f4ec;
+    --orange: #b85c00;
+    --orange-hell: #fff3e6;
+    --rot: #a01010;
+    --rot-hell: #fdeaea;
+    --grau: #4a4a4a;
+    --grau-hell: #f4f5f7;
+    --grau-rand: #d0d4dc;
+    --weiss: #ffffff;
+    --schatten: 0 2px 8px rgba(0,0,0,0.10);
+    --radius: 6px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 14px; color: #1a1a2e; background: #f0f2f6; min-height: 100vh; }
+
+  /* HEADER */
+  header { background: var(--blau); color: #fff; padding: 18px 28px 14px; border-bottom: 3px solid #b0c8e8; }
+  header h1 { font-size: 1.22rem; font-weight: 700; letter-spacing: 0.01em; }
+  header p { font-size: 0.82rem; color: #b8cde8; margin-top: 3px; }
+  .header-meta { display: flex; gap: 18px; margin-top: 10px; flex-wrap: wrap; }
+  .header-meta input, .header-meta select {
+    background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.3);
+    color: #fff; padding: 4px 10px; border-radius: 4px; font-size: 0.82rem; min-width: 160px;
+  }
+  .header-meta input::placeholder { color: rgba(255,255,255,0.55); }
+  .header-meta label { font-size: 0.78rem; color: #b8cde8; display: block; margin-bottom: 2px; }
+
+  /* NAVIGATION / FORTSCHRITT */
+  .nav-bar { background: var(--blau-mid); display: flex; gap: 0; overflow-x: auto; }
+  .nav-btn {
+    background: none; border: none; color: #b8d4f0; padding: 10px 18px; font-size: 0.82rem;
+    cursor: pointer; white-space: nowrap; border-bottom: 3px solid transparent; transition: all 0.18s;
+    font-weight: 500;
+  }
+  .nav-btn:hover { color: #fff; background: rgba(255,255,255,0.08); }
+  .nav-btn.aktiv { color: #fff; border-bottom: 3px solid #f0c040; background: rgba(255,255,255,0.1); }
+  .nav-btn .badge { display: inline-block; background: #f0c040; color: #003366; border-radius: 10px; padding: 1px 7px; font-size: 0.72rem; margin-left: 5px; font-weight: 700; }
+
+  /* FORTSCHRITTSBALKEN */
+  .fortschritt-bar { background: #dde3ec; height: 5px; }
+  .fortschritt-fill { height: 5px; background: linear-gradient(90deg, #1a7a4a, #4ab87a); transition: width 0.4s; }
+
+  /* MAIN */
+  main { max-width: 1100px; margin: 0 auto; padding: 22px 16px 40px; }
+
+  /* QB-HEADER */
+  .qb-header { background: var(--blau); color: #fff; border-radius: var(--radius) var(--radius) 0 0; padding: 14px 20px 12px; margin-bottom: 0; }
+  .qb-header h2 { font-size: 1.05rem; font-weight: 700; }
+  .qb-header p { font-size: 0.82rem; color: #b8cde8; margin-top: 3px; }
+
+  /* QA-KARTE */
+  .qa-karte { background: #fff; border: 1px solid var(--grau-rand); border-top: none; margin-bottom: 0; box-shadow: none; }
+  .qa-karte:last-child { border-radius: 0 0 var(--radius) var(--radius); margin-bottom: 22px; }
+  .qa-karte + .qa-karte { border-top: 1px solid var(--grau-rand); }
+
+  /* QA KLAPPTITEL */
+  .qa-titel {
+    display: flex; align-items: center; gap: 10px; padding: 13px 18px; cursor: pointer;
+    background: #fafbfd; transition: background 0.15s; user-select: none;
+  }
+  .qa-titel:hover { background: var(--blau-hell); }
+  .qa-nr { font-weight: 700; color: var(--blau); min-width: 38px; font-size: 0.92rem; }
+  .qa-name { flex: 1; font-weight: 600; color: #1a1a2e; font-size: 0.92rem; }
+  .qa-bewertung-badge { min-width: 28px; text-align: center; font-size: 0.82rem; font-weight: 700; border-radius: 4px; padding: 2px 8px; }
+  .badge-a { background: var(--gruen-hell); color: var(--gruen); }
+  .badge-b { background: var(--orange-hell); color: var(--orange); }
+  .badge-c { background: #fff3cd; color: #856404; }
+  .badge-d { background: var(--rot-hell); color: var(--rot); }
+  .badge-leer { background: #eee; color: #999; }
+  .klapp-pfeil { color: #888; font-size: 0.9rem; transition: transform 0.22s; }
+  .klapp-pfeil.auf { transform: rotate(180deg); }
+
+  /* QA INHALT */
+  .qa-inhalt { display: none; padding: 18px 22px 20px; border-top: 1px solid #e8ecf4; }
+  .qa-inhalt.offen { display: block; }
+
+  /* ALLGEMEINE BESCHREIBUNG */
+  .allg-beschreibung {
+    background: var(--blau-hell); border-left: 4px solid var(--blau-mid);
+    padding: 11px 15px; border-radius: 0 var(--radius) var(--radius) 0; margin-bottom: 16px;
+    font-size: 0.86rem; color: #1a2a4a; line-height: 1.5;
+  }
+  .allg-beschreibung strong { display: block; font-size: 0.78rem; color: var(--blau); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+
+  /* LEITFRAGE BLOCK */
+  .leitfrage-block { margin-bottom: 14px; border: 1px solid #dde3ec; border-radius: var(--radius); overflow: hidden; }
+  .leitfrage-header {
+    background: #f7f9fc; padding: 10px 14px; cursor: pointer; display: flex; align-items: flex-start; gap: 10px; user-select: none;
+  }
+  .leitfrage-header:hover { background: var(--blau-hell); }
+  .lf-nr { font-weight: 700; color: var(--blau); min-width: 24px; font-size: 0.85rem; padding-top: 1px; }
+  .lf-frage { flex: 1; font-weight: 600; font-size: 0.87rem; color: #1a1a2e; line-height: 1.5; }
+  .lf-pfeil { color: #aaa; font-size: 0.8rem; padding-top: 3px; transition: transform 0.18s; }
+  .lf-pfeil.auf { transform: rotate(180deg); }
+  .leitfrage-erlauterung {
+    display: none; background: #fff; padding: 11px 14px 11px 48px;
+    font-size: 0.84rem; color: #333; line-height: 1.6; border-top: 1px solid #e8ecf4;
+  }
+  .leitfrage-erlauterung.offen { display: block; }
+  .erlauterung-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--blau); font-weight: 700; margin-bottom: 5px; }
+
+  /* BEWERTUNG */
+  .bewertung-abschnitt { margin-top: 18px; padding-top: 15px; border-top: 1px solid #e8ecf4; }
+  .bewertung-abschnitt h4 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.07em; color: #555; margin-bottom: 10px; }
+  .bewertung-optionen { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
+  .bew-btn {
+    border: 2px solid #ddd; background: #f8f9fc; border-radius: var(--radius); padding: 10px 8px;
+    cursor: pointer; text-align: center; transition: all 0.18s; font-size: 0.82rem;
+  }
+  .bew-btn .bew-letter { font-size: 1.4rem; font-weight: 800; display: block; }
+  .bew-btn .bew-text { font-size: 0.73rem; color: #555; display: block; margin-top: 2px; line-height: 1.3; }
+  .bew-btn.aktiv-a, .bew-btn:hover.a-btn { background: var(--gruen-hell); border-color: var(--gruen); }
+  .bew-btn.aktiv-a .bew-letter { color: var(--gruen); }
+  .bew-btn.aktiv-b, .bew-btn:hover.b-btn { background: var(--orange-hell); border-color: var(--orange); }
+  .bew-btn.aktiv-b .bew-letter { color: var(--orange); }
+  .bew-btn.aktiv-c, .bew-btn:hover.c-btn { background: #fff9e0; border-color: #c9a800; }
+  .bew-btn.aktiv-c .bew-letter { color: #856404; }
+  .bew-btn.aktiv-d, .bew-btn:hover.d-btn { background: var(--rot-hell); border-color: var(--rot); }
+  .bew-btn.aktiv-d .bew-letter { color: var(--rot); }
+
+  /* BEMERKUNGSFELD */
+  .bemerkung-feld { margin-top: 12px; }
+  .bemerkung-feld label { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; color: #555; margin-bottom: 5px; display: block; }
+  .bemerkung-feld textarea {
+    width: 100%; border: 1px solid var(--grau-rand); border-radius: var(--radius); padding: 8px 10px;
+    font-size: 0.84rem; color: #1a1a2e; resize: vertical; min-height: 60px; font-family: inherit; transition: border 0.15s;
+  }
+  .bemerkung-feld textarea:focus { outline: none; border-color: var(--blau-mid); box-shadow: 0 0 0 2px #c4d8f5; }
+
+  /* QB4 FREITEXT */
+  .qb4-hinweis { background: #fff8e6; border-left: 4px solid #f0c040; padding: 10px 14px; border-radius: 0 var(--radius) var(--radius) 0; font-size: 0.85rem; color: #6b4e00; margin-bottom: 14px; }
+
+  /* QB5 KRITERIUM */
+  .kriterium-block { margin-bottom: 10px; border: 1px solid #dde3ec; border-radius: var(--radius); overflow: hidden; }
+  .kriterium-header { display: flex; align-items: center; gap: 10px; padding: 10px 14px; cursor: pointer; background: #f7f9fc; }
+  .kriterium-header:hover { background: var(--blau-hell); }
+  .krit-text { flex: 1; font-size: 0.86rem; color: #1a1a2e; line-height: 1.4; }
+  .krit-erlauterung { display: none; padding: 10px 14px 12px 44px; background: #fff; border-top: 1px solid #e8ecf4; font-size: 0.83rem; color: #444; line-height: 1.6; }
+  .krit-erlauterung.offen { display: block; }
+  .ja-nein-toggle { display: flex; gap: 6px; min-width: 120px; }
+  .jn-btn { flex: 1; padding: 5px 0; border-radius: 4px; border: 1.5px solid #ddd; background: #f5f5f5; cursor: pointer; font-size: 0.82rem; font-weight: 600; text-align: center; transition: all 0.15s; }
+  .jn-btn.ja { background: var(--gruen-hell); border-color: var(--gruen); color: var(--gruen); }
+  .jn-btn.nein { background: var(--rot-hell); border-color: var(--rot); color: var(--rot); }
+
+  /* AKTIONSLEISTE */
+  .aktions-leiste { display: flex; gap: 10px; justify-content: flex-end; margin: 18px 0 0; flex-wrap: wrap; }
+  .btn-prim { background: var(--blau); color: #fff; border: none; padding: 9px 20px; border-radius: var(--radius); font-size: 0.86rem; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+  .btn-prim:hover { background: var(--blau-mid); }
+  .btn-sek { background: #fff; color: var(--blau); border: 1.5px solid var(--blau); padding: 8px 18px; border-radius: var(--radius); font-size: 0.86rem; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+  .btn-sek:hover { background: var(--blau-hell); }
+  .btn-rot { background: #fff; color: var(--rot); border: 1.5px solid var(--rot); padding: 8px 18px; border-radius: var(--radius); font-size: 0.86rem; font-weight: 600; cursor: pointer; }
+  .btn-rot:hover { background: var(--rot-hell); }
+
+  /* SECTION AUSBLENDEN */
+  .section { display: none; }
+  .section.aktiv { display: block; }
+
+  /* TOAST */
+  #toast { position: fixed; bottom: 28px; right: 28px; background: #1a3a5c; color: #fff; padding: 11px 20px; border-radius: var(--radius); font-size: 0.88rem; box-shadow: var(--schatten); z-index: 9999; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+  #toast.show { opacity: 1; }
+
+  @media (max-width: 600px) {
+    .bewertung-optionen { grid-template-columns: repeat(2,1fr); }
+    .header-meta { gap: 10px; }
+    header h1 { font-size: 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Qualitätsprüfungs-Richtlinien Ambulante Pflege – Prüfinstrument</h1>
+  <p>MD Bund · Teil 1a – Ambulante Pflegedienste · Gültig ab 01.07.2026 · §§ 114 ff. SGB XI</p>
+  <div class="header-meta">
+    <div><label>Pflegedienst</label><input id="pflegedienst" type="text" placeholder="Name des Pflegedienstes"></div>
+    <div><label>Prüfer/in</label><input id="pruefer" type="text" placeholder="Name Prüfer/in"></div>
+    <div><label>Prüfdatum</label><input id="pruef-datum" type="date"></div>
+    <div><label>Prüfart</label>
+      <select id="pruefart">
+        <option value="">– bitte wählen –</option>
+        <option>Regelprüfung</option>
+        <option>Anlassprüfung</option>
+        <option>Wiederholungsprüfung</option>
+      </select>
+    </div>
+    <div><label>Fall-ID</label><input id="fall-id" type="text" placeholder="z. B. VP-01"></div>
+  </div>
+</header>
+
+<div class="nav-bar" id="nav-bar">
+  <button class="nav-btn aktiv" onclick="zeigeSection('qb1',this)">QB 1 <span class="badge" id="badge-qb1">—</span></button>
+  <button class="nav-btn" onclick="zeigeSection('qb2',this)">QB 2 <span class="badge" id="badge-qb2">—</span></button>
+  <button class="nav-btn" onclick="zeigeSection('qb3',this)">QB 3 <span class="badge" id="badge-qb3">—</span></button>
+  <button class="nav-btn" onclick="zeigeSection('qb4',this)">QB 4 <span class="badge" id="badge-qb4">—</span></button>
+  <button class="nav-btn" onclick="zeigeSection('qb5',this)">QB 5 <span class="badge" id="badge-qb5">—</span></button>
+  <button class="nav-btn" onclick="zeigeSection('export',this)">📋 Übersicht / Export</button>
+</div>
+<div class="fortschritt-bar"><div class="fortschritt-fill" id="fortschritt-fill" style="width:0%"></div></div>
+
+<main>
+
+<!-- ======================== QB 1 ======================== -->
+<div class="section aktiv" id="section-qb1">
+  <div class="qb-header">
+    <h2>Qualitätsbereich 1 · Unabhängig von vereinbarten Leistungen zu prüfende Aspekte</h2>
+    <p>Prüfbogen A · Personenbezogene Versorgung · Bewertung A–D</p>
+  </div>
+
+  <!-- 1.1 -->
+  <div class="qa-karte">
+    <div class="qa-titel" onclick="toggleQA('qa11')">
+      <span class="qa-nr">1.1</span>
+      <span class="qa-name">Aufnahmemanagement</span>
+      <span class="qa-bewertung-badge badge-leer" id="badge-qa11">–</span>
+      <span class="klapp-pfeil" id="pfeil-qa11">▼</span>
+    </div>
+    <div class="qa-inhalt" id="qa11">
+      <div class="allg-beschreibung">
+        <strong>Allgemeine Beschreibung (QPR Teil 1a, S. 49)</strong>
+        Zu prüfen ist, wie der ambulante Pflegedienst das Aufnahmemanagement bei Erstaufnahmen und Übernahmen durchführt. Geprüft wird das Aufnahmemanagement bei versorgten Personen, die innerhalb der letzten sechs Monate neu oder wieder vom ambulanten Pflegedienst aufgenommen wurden. Dieser Qualitätsaspekt bezieht sich auf die Informationssammlung zu Beginn oder Wiederbeginn der Versorgung. Unabhängig von Art und Umfang der vereinbarten Leistungen sind Informationen zum Ausmaß der individuellen Beeinträchtigungen und Ressourcen der versorgten Person sowie zu vorliegenden ärztlichen Diagnosen erforderlich.
+      </div>
+
+      <div class="leitfrage-block">
+        <div class="leitfrage-header" onclick="toggleLF(this)">
+          <span class="lf-nr">1.</span>
+          <span class="lf-frage">Ist ein strukturiertes Vorgehen bei der Informationssammlung und der anschließenden Planung und Vereinbarung von Maßnahmen erkennbar? Wurden die individuellen pflegerelevanten Einschränkungen, Ressourcen und Fähigkeiten erfasst?</span>
+          <span class="lf-pfeil">▼</span>
+        </div>
+        <div class="leitfrage-erlauterung">
+          <div class="erlauterung-label">Erläuterung (QPR Teil 1a, S. 50)</div>
+          Es ist zu prüfen, ob ein strukturiertes Vorgehen angewandt wird, mit dem die wesentlichen Informationen der Pflegesituation erfasst werden können. Dieses Vorgehen kann sich an den Prinzipien des Strukturmodells zur Entbürokratisierung der Pflegedokumentation orientieren, ebenso jedoch auf anderen Systematisierungsansätzen zur Gestaltung des Pflegeprozesses basieren (z. B. an Lebensaktivitäten orientierten Modellen).
+        </div>
+      </div>
+
+      <div class="leitfrage-block">
+        <div class="leitfrage-header" onclick="toggleLF(this)">
+          <span class="lf-nr">2.</span>
+          <span class="lf-frage">Wurde(n) die versorgte Person bzw. ihre An- und Zugehörigen zu ihrer Sichtweise bei der Informationssammlung und der Planung und Vereinbarung von Maßnahmen befragt?</span>
+          <span class="lf-pfeil">▼</span>
+        </div>
+        <div class="leitfrage-erlauterung">
+          <div class="erlauterung-label">Erläuterung (QPR Teil 1a, S. 50)</div>
+          Bei dieser Frage geht es darum, ob die versorgte Person die Gelegenheit hatte, ihre Wünsche und Bedürfnisse zu äußern und auf individuelle Aspekte ihrer Pflegesituation hinzuweisen. Zudem geht es darum, ob ihre Perspektive bei der Planung von Maßnahmen berücksichtigt wurde.
+        </div>
+      </div>
+
+      <div class="leitfrage-block">
+        <div class="leitfrage-header" onclick="toggleLF(this)">
+          <span class="lf-nr">3.</span>
+          <span class="lf-frage">Wurden weitergehende Informationen mit Relevanz für die Durchführung der Pflege erhoben (z. B. Medikation, Behandlungsverläufe, Versorgung durch andere Personen oder Einrichtungen)?</span>
+          <span class="lf-pfeil">▼</span>
+        </div>
+        <div class="leitfrage-erlauterung">
+          <div class="erlauterung-label">Erläuterung (QPR Teil 1a, S. 50)</div>
+          Angesprochen sind Informationen über verfügbare medizinische Diagnosen, den Medikamentenplan, Konsequenzen aus Krankenhausbehandlungen sowie Leistungen und Maßnahmen anderer Anbieter gesundheitlicher oder sozialer Dienstleistungen, soweit sie von Relevanz für den Pflegeprozess im entsprechenden Haushalt sind. In der Gesamtbetrachtung der drei Leitfragen sollte deutlich werden, dass die wesentlichen Informationen für die Durchführung des Pflegeprozesses erfasst wurden und Eingang in die Planung und Vereinbarung von Maßnahmen gefunden haben.
+        </div>
+      </div>
+
+      <div class="bewertung-abschnitt">
+        <h4>Bewertung der Auffälligkeiten und Defizite (QPR Anlage 3)</h4>
+        <div class="bewertung-optionen">
+          <div class="bew-btn a-btn" onclick="setBewertung('qa11','A',this)"><span class="bew-letter">A</span><span class="bew-text">Keine Auffälligkeiten</span></div>
+          <div class="bew-btn b-btn" onclick="setBewertung('qa11','B',this)"><span class="bew-letter">B</span><span class="bew-text">Auffälligkeit ohne Risiko negativer Folgen</span></div>
+          <div class="bew-btn c-btn" onclick="setBewertung('qa11','C',this)"><span class="bew-letter">C</span><span class="bew-text">Defizit mit Risiko negativer Folgen</span></div>
+          <div class="bew-btn d-btn" onclick="setBewertung('qa11','D',this)"><span class="bew-letter">D</span><span class="bew-text">Defizit mit eingetretenen negativen Folgen</span></div>
+        </div>
+      </div>
+      <div class="bemerkung-feld"><label>Beschreibung festgestellter Auffälligkeiten / Defizite</label><textarea id="bem-qa11" placeholder="Freitextfeld für Auffälligkeiten und Feststellungen …" oninput="speichern()"></textarea></div>
+    </div>
+  </div>
+
+  <!-- 1.2 -->
+  <div class="qa-karte">
+    <div class="qa-titel" onclick="toggleQA('qa12')">
+      <span class="qa-nr">1.2</span>
+      <span class="qa-name">Erfassung von und Reaktion auf Risiken und Gefahren</span>
+      <span class="qa-bewertung-badge badge-leer" id="badge-qa12">–</span>
+      <span class="klapp-pfeil" id="pfeil-qa12">▼</span>
+    </div>
+    <div class="qa-inhalt" id="qa12">
+      <div class="allg-beschreibung">
+        <strong>Allgemeine Beschreibung (QPR Teil 1a, S. 52)</strong>
+        Zu prüfen ist, ob der ambulante Pflegedienst gesundheitliche Risiken und Gefahren, die bei der versorgten Person vorliegen oder entstehen könnten, erkennt und ob er angemessen auf erkannte Risiken und Gefahren reagiert. Gemeint sind nur diejenigen Risiken und Gefahren, die über die beschriebenen Wege (Dokumentation, Fachgespräch, Inaugenscheinnahme) wahrgenommen wurden, nicht alle grundsätzlich möglichen Risiken im Rahmen einer pflegerischen Versorgung.
+      </div>
+      <div class="leitfrage-block">
+        <div class="leitfrage-header" onclick="toggleLF(this)">
+          <span class="lf-nr">1.</span>
+          <span class="lf-frage">Werden im Rahmen der Versorgung erkannte Risiken und Gefahren für die versorgte Person erfasst und dokumentiert?</span>
+          <span class="lf-pfeil">▼</span>
+        </div>
+        <div class="leitfrage-erlauterung">
+          <div class="erlauterung-label">Erläuterung (QPR Teil 1a, S. 53)</div>
+          Zu beurteilen ist, ob der ambulante Pflegedienst aus den ihm zugänglichen Informationsquellen (Dokumentation, Inaugenscheinnahme der versorgten Person, Fachgespräch) Risiken und Gefahren erkennt und festhält. Hinzu kommen offenkundige Risiken und Gefahren, also Sachverhalte, die die Mitarbeiterinnen und Mitarbeiter im Rahmen der Durchführung des individuellen pflegerischen Auftrags wahrnehmen, ohne hierzu gesonderte Einschätzungen vornehmen zu müssen.
+        </div>
+      </div>
+      <div class="leitfrage-block">
+        <div class="leitfrage-header" onclick="toggleLF(this)">
+          <span class="lf-nr">2.</span>
+          <span class="lf-frage">Reagiert der ambulante Pflegedienst angemessen auf erkannte Risiken und Gefahren?</span>
+          <span class="lf-pfeil">▼</span>
+        </div>
+        <div class="leitfrage-erlauterung">
+          <div class="erlauterung-label">Erläuterung (QPR Teil 1a, S. 53)</div>
+          Zu prüfen ist, ob der ambulante Pflegedienst erkannte Risiken und Gefahren durch geeignete Maßnahmen minimiert oder abwendet. Dies umfasst die Kommunikation mit der verordnenden Ärztin/dem verordnenden Arzt bei medizinischen Risiken sowie die Einbeziehung der versorgten Person und ihrer An- und Zugehörigen. Die Reaktion des Pflegedienstes auf Risiken und Gefahren muss fachlich nachvollziehbar und verhältnismäßig sein.
+        </div>
+      </div>
+      <div class="bewertung-abschnitt">
+        <h4>Bewertung der Auffälligkeiten und Defizite (QPR Anlage 3)</h4>
+        <div class="bewertung-optionen">
+          <div class="bew-btn a-btn" onclick="setBewertung('qa12','A',this)"><span class="bew-letter">A</span><span class="bew-text">Keine Auffälligkeiten</span></div>
+          <div class="bew-btn b-btn" onclick="setBewertung('qa12','B',this)"><span class="bew-letter">B</span><span class="bew-text">Auffälligkeit ohne Risiko negativer Folgen</span></div>
+          <div class="bew-btn c-btn" onclick="setBewertung('qa12','C',this)"><span class="bew-letter">C</span><span class="bew-text">Defizit mit Risiko negativer Folgen</span></div>
+          <div class="bew-btn d-btn" onclick="setBewertung('qa12','D',this)"><span class="bew-letter">D</span><span class="bew-text">Defizit mit eingetretenen negativen Folgen</span></div>
+        </div>
+      </div>
+      <div class="bemerkung-feld"><label>Beschreibung festgestellter Auffälligkeiten / Defizite</label><textarea id="bem-qa12" placeholder="Freitextfeld für Auffälligkeiten und Feststellungen …" oninput="speichern()"></textarea></div>
+    </div>
+  </div>
+
+  <!-- 1.3 -->
+  <div class="qa-karte">
+    <div class="qa-titel" onclick="toggleQA('qa13')">
+      <span class="qa-nr">1.3</span>
+      <span class="qa-name">Erfassung von und Reaktion auf Anzeichen einer Destabilisierung der Versorgungssituation</span>
+      <span class="qa-bewertung-badge badge-leer" id="badge-qa13">–</span>
+      <span class="klapp-pfeil" id="pfeil-qa13">▼</span>
+    </div>
+    <div class="qa-inhalt" id="qa13">
+      <div class="allg-beschreibung">
+        <strong>Allgemeine Beschreibung (QPR Teil 1a, S. 55)</strong>
+        Zu prüfen ist, ob der ambulante Pflegedienst Anzeichen einer Destabilisierung der Versorgungssituation erkennt und ob er angemessen reagiert. Unter einer Destabilisierung der Versorgungssituation sind Veränderungen zu verstehen, die die Aufrechterhaltung der häuslichen Versorgung gefährden könnten, beispielsweise eine zunehmende Überforderung pflegender An- und Zugehöriger, eine Abnahme der Pflegebereitschaft oder eine Abnahme der Selbstpflegefähigkeit der versorgten Person.
+      </div>
+      <div class="leitfrage-block">
+        <div class="leitfrage-header" onclick="toggleLF(this)">
+          <span class="lf-nr">1.</span>
+          <span class="lf-frage">Wurden offenkundige Anzeichen einer Überforderung des Hilfenetzes, einer abnehmenden Pflegebereitschaft oder einer abnehmenden Selbstpflegefähigkeit erkannt und dokumentiert?</span>
+          <span class="lf-pfeil">▼</span>
+        </div>
+        <div class="leitfrage-erlauterung">
+          <div class="erlauterung-label">Erläuterung (QPR Teil 1a, S. 56)</div>
+          Zu beurteilen ist, ob der ambulante Pflegedienst Veränderungen in der Versorgungssituation wahrnimmt, die auf eine drohende Destabilisierung hindeuten. Dazu gehören erkennbare Überlastungszeichen bei pflegenden An- und Zugehörigen, eine nachlassende Motivation oder Fähigkeit zur Pflegebeteiligung sowie eine Verschlechterung des Gesundheitszustands der versorgten Person, die die bisherige Versorgungsstruktur in Frage stellt.
+        </div>
+      </div>
+      <div class="leitfrage-block">
+        <div class="leitfrage-header" onclick="toggleLF(this)">
+          <span class="lf-nr">2.</span>
+          <span class="lf-frage">Reagiert der ambulante Pflegedienst angemessen auf erkannte Anzeichen einer Destabilisierung?</span>
+          <span class="lf-pfeil">▼</span>
+        </div>
+        <div class="leitfrage-erlauterung">
+          <div class="erlauterung-label">Erläuterung (QPR Teil 1a, S. 56)</div>
+          Zu prüfen ist, ob der ambulante Pflegedienst bei erkannter Destabilisierung geeignete Maßnahmen einleitet – beispielsweise Beratung der An- und Zugehörigen, Kontaktaufnahme mit der verordnenden Ärztin/dem verordnenden Arzt, Einleitung weitergehender Hilfsangebote oder Anpassung des Pflegeplans. Die Reaktion muss erkennbar und fachlich nachvollziehbar sein.
+        </div>
+      </div>
+      <div class="bewertung-abschnitt">
+        <h4>Bewertung der Auffälligkeiten und Defizite (QPR Anlage 3)</h4>
+        <div class="bewertung-optionen">
+          <div class="bew-btn a-btn" onclick="setBewertung('qa13','A',this)"><span class="bew-letter">A</span><span class="bew-text">Keine Auffälligkeiten</span></div>
+          <div class="bew-btn b-btn" onclick="setBewertung('qa13','B',this)"><span class="bew-letter">B</span><span class="bew-text">Auffälligkeit ohne Risiko negativer Folgen</span></div>
+          <div class="bew-btn c-btn" onclick="setBewertung('qa13','C',this)"><span class="bew-letter">C</span><span class="bew-text">Defizit mit Risiko negativer Folgen</span></div>
+          <div class="bew-btn d-btn" onclick="setBewertung('qa13','D',this)"><span class="bew-letter">D</span><span class="bew-text">Defizit mit eingetretenen negativen Folgen</span></div>
+        </div>
+      </div>
+      <div class="bemerkung-feld"><label>Beschreibung festgestellter Auffälligkeiten / Defizite</label><textarea id="bem-qa13" placeholder="Freitextfeld für Auffälligkeiten und Feststellungen …" oninput="speichern()"></textarea></div>
+    </div>
+  </div>
+  <div class="aktions-leiste"><button class="btn-prim" onclick="zeigeSection('qb2',document.querySelectorAll('.nav-btn')[1])">Weiter zu QB 2 →</button></div>
+</div>
+
+<!-- ======================== QB 2 ======================== -->
+<div class="section" id="section-qb2">
+  <div class="qb-header">
+    <h2>Qualitätsbereich 2 · Versorgung im Rahmen der individuell vereinbarten Leistungen</h2>
+    <p>Prüfbogen A · Nur zu beurteilen, wenn die entsprechende Hilfe Bestandteil des Auftrags ist · Bewertung A–D</p>
+  </div>
+
+  <!-- 2.1 -->
+  <div class="qa-karte">
+    <div class="qa-titel" onclick="toggleQA('qa21')">
+      <span class="qa-nr">2.1</span>
+      <span class="qa-name">Unterstützung im Bereich der Mobilität</span>
+      <span class="qa-bewertung-badge badge-leer" id="badge-qa21">–</span>
+      <span class="klapp-pfeil" id="pfeil-qa21">▼</span>
+    </div>
+    <div class="qa-inhalt" id="qa21">
+      <div class="allg-beschreibung">
+        <strong>Allgemeine Beschreibung (QPR Teil 1a, S. 61)</strong>
+        Zu prüfen ist, ob die versorgte Person eine dem individuellen Bedarf entsprechende Unterstützung im Bereich der Mobilität erhält. Dieser Qualitätsaspekt umfasst Hilfen bei der Fortbewegung, beim Positionswechsel im Bett oder im Sitzen sowie bei der Nutzung von Hilfsmitteln zur Mobilität. Maßgeblich ist der individuelle Bedarf der versorgten Person unter Berücksichtigung ihrer Ressourcen und Fähigkeiten.
+      </div>
+      <div class="leitfrage-block">
+        <div class="leitfrage-header" onclick="toggleLF(this)">
+          <span class="lf-nr">1.</span>
+          <span class="lf-frage">Entspricht die Unterstützung im Bereich der Mobilität dem individuellen Bedarf der versorgten Person und werden ihre Ressourcen und Fähigkeiten berücksichtigt?</span>
+          <span class="lf-pfeil">▼</span>
+        </div>
+        <div class="leitfrage-erlauterung">
+          <div class="erlauterung-label">Erläuterung (QPR Teil 1a, S. 62)</div>
+          Zu prüfen ist, ob die geplanten und durchgeführten Maßnahmen dem individuellen Mobilitätsbedarf der versorgten Person entsprechen. Dabei ist zu beurteilen, ob die Ressourcen und noch vorhandenen Fähigkeiten der versorgten Person in die Planung einbezogen wurden und ob die Maßnahmen auf den Erhalt oder die Förderung der Mobilität ausgerichtet sind. Aktivierende Pflege soll erkennbar sein.
+        </div>
+      </div>
+      <div class="leitfrage-block">
+        <div class="leitfrage-header" onclick="toggleLF(this)">
+          <span class="lf-nr">2.</span>
+          <span class="lf-frage">Werden Risiken im Zusammenhang mit der eingeschränkten Mobilität (z. B. Sturz, Dekubitus, Kontraktur) erkannt und bedarfsgerechte Maßnahmen ergriffen?</span>
+          <span class="lf-pfeil">▼</span>
+        </div>
+        <div class="leitfrage-erlauterung">
+          <div class="erlauterung-label">Erläuterung (QPR Teil 1a, S. 62)</div>
+          Eingeschränkte Mobilität geht mit spezifischen Risiken einher (Sturz, Dekubitusentstehung, Kontrakturen, Pneumonie). Zu beurteilen ist, ob der ambulante Pflegedienst diese Risiken erkennt und geeignete präventive Maßnahmen plant und durchführt. Die Maßnahmen sind auf den Einzelfall abzustimmen und müssen fachlich begründbar sein.
+        </div>
+      </div>
+      <div class="bewertung-abschnitt">
+        <h4>Bewertung der Auffälligkeiten und Defizite (QPR Anlage 3)</h4>
+        <div class="bewertung-optionen">
+          <div class="bew-btn a-btn" onclick="setBewertung('qa21','A',this)"><span class="bew-letter">A</span><span class="bew-text">Keine Auffälligkeiten</span></div>
+          <div class="bew-btn b-btn" onclick="setBewertung('qa21','B',this)"><span class="bew-letter">B</span><span class="bew-text">Auffälligkeit ohne Risiko negativer Folgen</span></div>
+          <div class="bew-btn c-btn" onclick="setBewertung('qa21','C',this)"><span class="bew-letter">C</span><span class="bew-text">Defizit mit Risiko negativer Folgen</span></div>
+          <div class="bew-btn d-btn" onclick="setBewertung('qa21','D',this)"><span class="bew-letter">D</span><span class="bew-text">Defizit mit eingetretenen negativen Folgen</span></div>
+        </div>
+      </div>
+      <div class="bemerkung-feld"><label>Beschreibung festgestellter Auffälligkeiten / Defizite</label><textarea id="bem-qa21" placeholder="Freitextfeld …" oninput="speichern()"></textarea></div>
+    </div>
+  </div>
+
+  <!-- 2.5 -->
+  <div class="qa-karte">
+    <div class="qa-titel" onclick="toggleQA('qa25')">
+      <span class="qa-nr">2.5</span>
+      <span class="qa-name">Unterstützung bei der Körperpflege</span>
+      <span class="qa-bewertung-badge badge-leer" id="badge-qa25">–</span>
+      <span class="klapp-pfeil" id="pfeil-qa25">▼</span>
+    </div>
+    <div class="qa-inhalt" id="qa25">
+      <div class="allg-beschreibung">
+        <strong>Allgemeine Beschreibung (QPR Teil 1a, S. 75)</strong>
+        Zu prüfen ist, ob die versorgte Person eine dem individuellen Bedarf entsprechende Unterstützung bei der Körperpflege erhält. Dieser Qualitätsaspekt umfasst alle körperpflegenden Maßnahmen (Waschen, Baden/Duschen, Mund- und Zahnpflege, Haar- und Nagelpflege), die der ambulante Pflegedienst im Rahmen seines Auftrags erbringt.
+      </div>
+      <div class="leitfrage-block">
+        <div class="leitfrage-header" onclick="toggleLF(this)">
+          <span class="lf-nr">1.</span>
+          <span class="lf-frage">Entspricht die Unterstützung bei der Körperpflege dem individuellen Bedarf, den Gewohnheiten und den Wünschen der versorgten Person?</span>
+          <span class="lf-pfeil">▼</span>
+        </div>
+        <div class="leitfrage-erlauterung">
+          <div class="erlauterung-label">Erläuterung (QPR Teil 1a, S. 76)</div>
+          Zu prüfen ist, ob Art, Umfang und Häufigkeit der körperpflegenden Maßnahmen dem Bedarf und den Wünschen der versorgten Person entsprechen. Dabei sind die Gewohnheiten und Vorstellungen der versorgten Person zu berücksichtigen. Aktivierende Pflege soll erkennbar sein: Die noch vorhandenen Selbstpflegefähigkeiten der versorgten Person sind zu fördern und zu erhalten, nicht zu ersetzen.
+        </div>
+      </div>
+      <div class="leitfrage-block">
+        <div class="leitfrage-header" onclick="toggleLF(this)">
+          <span class="lf-nr">2.</span>
+          <span class="lf-frage">Werden im Zusammenhang mit der Körperpflege wahrgenommene Hautveränderungen oder andere gesundheitliche Auffälligkeiten erkannt und angemessen darauf reagiert?</span>
+          <span class="lf-pfeil">▼</span>
+        </div>
+        <div class="leitfrage-erlauterung">
+          <div class="erlauterung-label">Erläuterung (QPR Teil 1a, S. 76)</div>
+          Die Körperpflege gibt dem ambulanten Pflegedienst Gelegenheit, den allgemeinen Zustand der Haut und des Körpers der versorgten Person zu beurteilen. Zu prüfen ist, ob auffällige Veränderungen (z. B. Hautdefekte, Druckstellen, Hämatome, Veränderungen des Allgemeinzustands) wahrgenommen und dokumentiert sowie ggf. der verordnenden Ärztin/dem verordnenden Arzt mitgeteilt werden.
+        </div>
+      </div>
+      <div class="bewertung-abschnitt">
+        <h4>Bewertung der Auffälligkeiten und Defizite (QPR Anlage 3)</h4>
+        <div class="bewertung-optionen">
+          <div class="bew-btn a-btn" onclick="setBewertung('qa25','A',this)"><span class="bew-letter">A</span><span class="bew-text">Keine Auffälligkeiten</span></div>
+          <div class="bew-btn b-btn" onclick="setBewertung('qa25','B',this)"><span class="bew-letter">B</span><span class="bew-text">Auffälligkeit ohne Risiko negativer Folgen</span></div>
+          <div class="bew-btn c-btn" onclick="setBewertung('qa25','C',this)"><span class="bew-letter">C</span><span class="bew-text">Defizit mit Risiko negativer Folgen</span></div>
+          <div class="bew-btn d-btn" onclick="setBewertung('qa25','D',this)"><span class="bew-letter">D</span><span class="bew-text">Defizit mit eingetretenen negativen Folgen</span></div>
+        </div>
+      </div>
+      <div class="bemerkung-feld"><label>Beschreibung festgestellter Auffälligkeiten / Defizite</label><textarea id="bem-qa25" placeholder="Freitextfeld …" oninput="speichern()"></textarea></div>
+    </div>
+  </div>
+
+  <!-- 2.6 -->
+  <div class="qa-karte">
+    <div class="qa-titel" onclick="toggleQA('qa26')">
+      <span class="qa-nr">2.6</span>
+      <span class="qa-name">Unterstützung bei der Nahrungs- und Flüssigkeitsaufnahme</span>
+      <span class="qa-bewertung-badge badge-leer" id="badge-qa26">–</span>
+      <span class="klapp-pfeil" id="pfeil-qa26">▼</span>
+    </div>
+    <div class="qa-inhalt" id="qa26">
+      <div class="allg-beschreibung">
+        <strong>Allgemeine Beschreibung (QPR Teil 1a, S. 78)</strong>
+        Zu prüfen ist, ob die versorgte Person eine dem individuellen Bedarf entsprechende Unterstützung bei der Nahrungs- und Flüssigkeitsaufnahme erhält und ob Risiken im Zusammenhang mit der Ernährung und Flüssigkeitsversorgung erkannt werden.
+      </div>
+      <div class="leitfrage-block">
+        <div class="leitfrage-header" onclick="toggleLF(this)">
+          <span class="lf-nr">1.</span>
+          <span class="lf-frage">Entspricht die Unterstützung bei der Nahrungs- und Flüssigkeitsaufnahme dem individuellen Bedarf der versorgten Person?</span>
+          <span class="lf-pfeil">▼</span>
+        </div>
+        <div class="leitfrage-erlauterung">
+          <div class="erlauterung-label">Erläuterung (QPR Teil 1a, S. 79)</div>
+          Zu prüfen ist, ob Art und Umfang der Unterstützung dem individuellen Bedarf der versorgten Person entsprechen. Dazu gehören das Anreichen von Nahrung und Flüssigkeit, die Berücksichtigung von Schluckstörungen, diätetischen Vorgaben oder kulturellen bzw. religiösen Besonderheiten. Aktivierende Pflege: Verbliebene Fähigkeiten der versorgten Person sollen gefördert, nicht ersetzt werden.
+        </div>
+      </div>
+      <div class="leitfrage-block">
+        <div class="leitfrage-header" onclick="toggleLF(this)">
+          <span class="lf-nr">2.</span>
+          <span class="lf-frage">Werden Risiken einer Mangelernährung oder Dehydratation erkannt und werden angemessene Maßnahmen ergriffen?</span>
+          <span class="lf-pfeil">▼</span>
+        </div>
+        <div class="leitfrage-erlauterung">
+          <div class="erlauterung-label">Erläuterung (QPR Teil 1a, S. 79)</div>
+          Hinweise auf Mangelernährung oder Dehydratation (z. B. ungewollter Gewichtsverlust, trockene Schleimhäute, Verwirrtheit) müssen erkannt und dokumentiert werden. Bei entsprechenden Hinweisen ist zu prüfen, ob der ambulante Pflegedienst Maßnahmen einleitet (z. B. Kontakt zur verordnenden Ärztin/zum verordnenden Arzt, Anpassung des Versorgungsplans, Einbeziehung der An- und Zugehörigen).
+        </div>
+      </div>
+      <div class="bewertung-abschnitt">
+        <h4>Bewertung der Auffälligkeiten und Defizite (QPR Anlage 3)</h4>
+        <div class="bewertung-optionen">
+          <div class="bew-btn a-btn" onclick="setBewertung('qa26','A',this)"><span class="bew-letter">A</span><span class="bew-text">Keine Auffälligkeiten</span></div>
+          <div class="bew-btn b-btn" onclick="setBewertung('qa26','B',this)"><span class="bew-letter">B</span><span class="bew-text">Auffälligkeit ohne Risiko negativer Folgen</span></div>
+          <div class="bew-btn c-btn" onclick="setBewertung('qa26','C',this)"><span class="bew-letter">C</span><span class="bew-text">Defizit mit Risiko negativer Folgen</span></div>
+          <div class="bew-btn d-btn" onclick="setBewertung('qa26','D',this)"><span class="bew-letter">D</span><span class="bew-text">Defizit mit eingetretenen negativen Folgen</span></div>
+        </div>
+      </div>
+      <div class="bemerkung-feld"><label>Beschreibung festgestellter Auffälligkeiten / Defizite</label><textarea id="bem-qa26" placeholder="Freitextfeld …" oninput="speichern()"></textarea></div>
+    </div>
+  </div>
+
+  <div class="aktions-leiste">
+    <button class="btn-sek" onclick="zeigeSection('qb1',document.querySelectorAll('.nav-btn')[0])">← QB 1</button>
+    <button class="btn-prim" onclick="zeigeSection('qb3',document.querySelectorAll('.nav-btn')[2])">Weiter zu QB 3 →</button>
+  </div>
+</div>
+
+<!-- ======================== QB 3 ======================== -->
+<div class="section" id="section-qb3">
+  <div class="qb-header">
+    <h2>Qualitätsbereich 3 · Maßnahmen im Rahmen ärztlich verordneter Leistungen</h2>
+    <p>Prüfbogen A · Nur zu beurteilen, wenn die Maßnahme ärztlich verordnet und vom Pflegedienst erbracht wird · Bewertung A–D</p>
+  </div>
+
+  <!-- 3.1.21 -->
+  <div class="qa-karte">
+    <div class="qa-titel" onclick="toggleQA('qa3121')">
+      <span class="qa-nr">3.1.21</span>
+      <span class="qa-name">Medikamente (außer Injektionen, Infusionen, Instillationen, Inhalationen)</span>
+      <span class="qa-bewertung-badge badge-leer" id="badge-qa3121">–</span>
+      <span class="klapp-pfeil" id="pfeil-qa3121">▼</span>
+    </div>
+    <div class="qa-inhalt" id="qa3121">
+      <div class="allg-beschreibung">
+        <strong>Allgemeine Beschreibung (QPR Teil 1a, S. 157)</strong>
+        Zu prüfen ist, ob die Medikamentengabe sach- und fachgerecht sowie entsprechend der ärztlichen Verordnung durchgeführt wird. Dies umfasst das Stellen, Richten und Verabreichen von Medikamenten sowie die Überwachung der Medikamentenwirkung und möglicher Nebenwirkungen.
+      </div>
+      <div class="leitfrage-block">
+        <div class="leitfrage-header" onclick="toggleLF(this)">
+          <span class="lf-nr">1.</span>
+          <span class="lf-frage">Werden die Medikamente entsprechend der ärztlichen Verordnung und den pharmazeutischen Vorgaben gestellt, gerichtet und verabreicht?</span>
+          <span class="lf-pfeil">▼</span>
+        </div>
+        <div class="leitfrage-erlauterung">
+          <div class="erlauterung-label">Erläuterung (QPR Teil 1a, S. 158)</div>
+          Zu prüfen ist, ob Zeitpunkt, Dosierung und Applikationsform der Medikamentengabe der ärztlichen Verordnung und dem aktuellen Medikamentenplan entsprechen. Die Identität der Medikamente und die Beachtung von Unverträglichkeiten und Wechselwirkungen sind zu beurteilen. Auf das Vier-Augen-Prinzip beim Richten von Medikamenten ist zu achten, sofern dies vertraglich vereinbart ist.
+        </div>
+      </div>
+      <div class="leitfrage-block">
+        <div class="leitfrage-header" onclick="toggleLF(this)">
+          <span class="lf-nr">2.</span>
+          <span class="lf-frage">Wird die Wirkung der Medikamente beobachtet und werden Auffälligkeiten sowie Nebenwirkungen erkannt und dokumentiert?</span>
+          <span class="lf-pfeil">▼</span>
+        </div>
+        <div class="leitfrage-erlauterung">
+          <div class="erlauterung-label">Erläuterung (QPR Teil 1a, S. 158)</div>
+          Der ambulante Pflegedienst hat im Rahmen der Leistungserbringung Nebenwirkungen und unerwünschte Wirkungen der Medikamente zu beobachten und zu dokumentieren. Bei Auffälligkeiten ist die verordnende Ärztin/der verordnende Arzt zu informieren. Dazu gehören auch Veränderungen des Allgemeinzustands, die mit der Medikation in Zusammenhang stehen könnten.
+        </div>
+      </div>
+      <div class="bewertung-abschnitt">
+        <h4>Bewertung der Auffälligkeiten und Defizite (QPR Anlage 3)</h4>
+        <div class="bewertung-optionen">
+          <div class="bew-btn a-btn" onclick="setBewertung('qa3121','A',this)"><span class="bew-letter">A</span><span class="bew-text">Keine Auffälligkeiten</span></div>
+          <div class="bew-btn b-btn" onclick="setBewertung('qa3121','B',this)"><span class="bew-letter">B</span><span class="bew-text">Auffälligkeit ohne Risiko negativer Folgen</span></div>
+          <div class="bew-btn c-btn" onclick="setBewertung('qa3121','C',this)"><span class="bew-letter">C</span><span class="bew-text">Defizit mit Risiko negativer Folgen</span></div>
+          <div class="bew-btn d-btn" onclick="setBewertung('qa3121','D',this)"><span class="bew-letter">D</span><span class="bew-text">Defizit mit eingetretenen negativen Folgen</span></div>
+        </div>
+      </div>
+      <div class="bemerkung-feld"><label>Beschreibung festgestellter Auffälligkeiten / Defizite</label><textarea id="bem-qa3121" placeholder="Freitextfeld …" oninput="speichern()"></textarea></div>
+    </div>
+  </div>
+
+  <!-- 3.1.28 -->
+  <div class="qa-karte">
+    <div class="qa-titel" onclick="toggleQA('qa3128')">
+      <span class="qa-nr">3.1.28</span>
+      <span class="qa-name">Wundversorgung einer chronischen und schwer heilenden Wunde</span>
+      <span class="qa-bewertung-badge badge-leer" id="badge-qa3128">–</span>
+      <span class="klapp-pfeil" id="pfeil-qa3128">▼</span>
+    </div>
+    <div class="qa-inhalt" id="qa3128">
+      <div class="allg-beschreibung">
+        <strong>Allgemeine Beschreibung (QPR Teil 1a, S. 181)</strong>
+        Zu prüfen ist, ob die Wundversorgung einer chronischen und schwer heilenden Wunde sach- und fachgerecht entsprechend der ärztlichen Verordnung und dem aktuellen Stand des Wissens (z. B. Expertenstandard Pflege von Menschen mit chronischen Wunden des DNQP) durchgeführt wird. Dies umfasst die Wundbeurteilung, die Wundversorgung sowie die Dokumentation des Wundverlaufs.
+      </div>
+      <div class="leitfrage-block">
+        <div class="leitfrage-header" onclick="toggleLF(this)">
+          <span class="lf-nr">1.</span>
+          <span class="lf-frage">Wird die chronische Wunde regelmäßig und strukturiert beurteilt (Wundgröße, Wundtiefe, Wundrand, Wundexsudat, Infektionszeichen) und der Wundverlauf dokumentiert?</span>
+          <span class="lf-pfeil">▼</span>
+        </div>
+        <div class="leitfrage-erlauterung">
+          <div class="erlauterung-label">Erläuterung (QPR Teil 1a, S. 182)</div>
+          Zu prüfen ist, ob der Wundzustand systematisch beurteilt und dokumentiert wird. Eine strukturierte Wundbeurteilung umfasst Angaben zu Lokalisation, Wundgröße, Wundtiefe, Wundrand, Wundumgebung, Wundexsudat (Menge, Farbe, Konsistenz, Geruch) sowie Zeichen einer lokalen Infektion. Die Dokumentation muss eine Beurteilung des Wundverlaufs und der Wirksamkeit der eingesetzten Maßnahmen ermöglichen.
+        </div>
+      </div>
+      <div class="leitfrage-block">
+        <div class="leitfrage-header" onclick="toggleLF(this)">
+          <span class="lf-nr">2.</span>
+          <span class="lf-frage">Wird die Wundversorgung entsprechend der ärztlichen Verordnung und dem aktuellen Stand des Wissens (feucht-warmes Wundmilieu, Phasengerechtigkeit) durchgeführt?</span>
+          <span class="lf-pfeil">▼</span>
+        </div>
+        <div class="leitfrage-erlauterung">
+          <div class="erlauterung-label">Erläuterung (QPR Teil 1a, S. 182)</div>
+          Zu beurteilen ist, ob die eingesetzten Wundauflagen und -verbände der ärztlichen Verordnung und dem aktuellen Wundstadium entsprechen. Grundlage ist der Expertenstandard „Pflege von Menschen mit chronischen Wunden" (DNQP). Wichtig: Bei Anzeichen einer Wundverschlechterung oder einer lokalen bzw. systemischen Infektion ist die verordnende Ärztin/der verordnende Arzt unverzüglich zu informieren.
+        </div>
+      </div>
+      <div class="bewertung-abschnitt">
+        <h4>Bewertung der Auffälligkeiten und Defizite (QPR Anlage 3)</h4>
+        <div class="bewertung-optionen">
+          <div class="bew-btn a-btn" onclick="setBewertung('qa3128','A',this)"><span class="bew-letter">A</span><span class="bew-text">Keine Auffälligkeiten</span></div>
+          <div class="bew-btn b-btn" onclick="setBewertung('qa3128','B',this)"><span class="bew-letter">B</span><span class="bew-text">Auffälligkeit ohne Risiko negativer Folgen</span></div>
+          <div class="bew-btn c-btn" onclick="setBewertung('qa3128','C',this)"><span class="bew-letter">C</span><span class="bew-text">Defizit mit Risiko negativer Folgen</span></div>
+          <div class="bew-btn d-btn" onclick="setBewertung('qa3128','D',this)"><span class="bew-letter">D</span><span class="bew-text">Defizit mit eingetretenen negativen Folgen</span></div>
+        </div>
+      </div>
+      <div class="bemerkung-feld"><label>Beschreibung festgestellter Auffälligkeiten / Defizite</label><textarea id="bem-qa3128" placeholder="Freitextfeld …" oninput="speichern()"></textarea></div>
+    </div>
+  </div>
+
+  <div class="aktions-leiste">
+    <button class="btn-sek" onclick="zeigeSection('qb2',document.querySelectorAll('.nav-btn')[1])">← QB 2</button>
+    <button class="btn-prim" onclick="zeigeSection('qb4',document.querySelectorAll('.nav-btn')[3])">Weiter zu QB 4 →</button>
+  </div>
+</div>
+
+<!-- ======================== QB 4 ======================== -->
+<div class="section" id="section-qb4">
+  <div class="qb-header">
+    <h2>Qualitätsbereich 4 · Sonstige Qualitätsaspekte in der personenbezogenen Prüfung</h2>
+    <p>Prüfbogen A · Kein A–D-Bewertungsschema · Aufgreifen als Gesprächsangebot · Auffälligkeiten im Freitextfeld</p>
+  </div>
+
+  <!-- 4.1 -->
+  <div class="qa-karte">
+    <div class="qa-titel" onclick="toggleQA('qa41')">
+      <span class="qa-nr">4.1</span>
+      <span class="qa-name">Zusammenarbeit mit An- und Zugehörigen</span>
+      <span class="qa-bewertung-badge badge-leer" id="badge-qa41">–</span>
+      <span class="klapp-pfeil" id="pfeil-qa41">▼</span>
+    </div>
+    <div class="qa-inhalt" id="qa41">
+      <div class="qb4-hinweis">
+        <strong>Hinweis zur Prüfmethodik (QPR Teil 1a, S. 210):</strong> Die Qualitätsaspekte des QB 4 werden von den Prüferinnen und Prüfern in Form eines Gesprächsangebots aufgegriffen, wenn die jeweiligen Voraussetzungen erfüllt sind. Es erfolgt keine standardisierte A–D-Bewertung. Werden Auffälligkeiten identifiziert, sind diese im Freitextfeld aufzuführen und können im Rahmen der Beratung erläutert werden.
+      </div>
+      <div class="allg-beschreibung">
+        <strong>Allgemeine Beschreibung (QPR Teil 1a, S. 211)</strong>
+        Zu prüfen ist, ob der ambulante Pflegedienst die An- und Zugehörigen in die Versorgungsgestaltung einbezieht und ob die Zusammenarbeit bedarfsgerecht und kommunikativ auf Augenhöhe gestaltet wird. Die An- und Zugehörigen sind wichtige Kooperationspartner für den ambulanten Pflegedienst.
+      </div>
+      <div class="leitfrage-block">
+        <div class="leitfrage-header" onclick="toggleLF(this)">
+          <span class="lf-nr">1.</span>
+          <span class="lf-frage">Werden die An- und Zugehörigen in die Versorgungsplanung und -gestaltung einbezogen und werden ihre Sichtweisen berücksichtigt?</span>
+          <span class="lf-pfeil">▼</span>
+        </div>
+        <div class="leitfrage-erlauterung">
+          <div class="erlauterung-label">Erläuterung (QPR Teil 1a, S. 212)</div>
+          Zu beurteilen ist, ob der ambulante Pflegedienst die An- und Zugehörigen als Partner in der Versorgung wahrnimmt und einbezieht. Dies umfasst die Berücksichtigung ihrer Sichtweisen bei der Versorgungsplanung, die regelmäßige Kommunikation sowie die Information über relevante Veränderungen im Versorgungsverlauf. Ihre Belastungssituation soll wahrgenommen und ggf. thematisiert werden.
+        </div>
+      </div>
+      <div class="bemerkung-feld">
+        <label>Festgestellte Auffälligkeiten (kein A–D)</label>
+        <textarea id="bem-qa41" placeholder="Auffälligkeiten im Sinne des § 6.1 QPR Teil 1a – kein standardisiertes Bewertungsschema …" oninput="setBewertung('qa41','offen',null); speichern()"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4.2 -->
+  <div class="qa-karte">
+    <div class="qa-titel" onclick="toggleQA('qa42')">
+      <span class="qa-nr">4.2</span>
+      <span class="qa-name">Erfassung von und Reaktion auf Anzeichen von Gewalt, Vernachlässigung, Unterversorgung</span>
+      <span class="qa-bewertung-badge badge-leer" id="badge-qa42">–</span>
+      <span class="klapp-pfeil" id="pfeil-qa42">▼</span>
+    </div>
+    <div class="qa-inhalt" id="qa42">
+      <div class="qb4-hinweis">
+        <strong>Hinweis zur Prüfmethodik (QPR Teil 1a, S. 210):</strong> Dieser Qualitätsaspekt wird nur aufgegriffen, wenn konkrete Hinweise auf Gewalt, Vernachlässigung oder Unterversorgung vorliegen. Kein standardisiertes A–D-Bewertungsschema.
+      </div>
+      <div class="allg-beschreibung">
+        <strong>Allgemeine Beschreibung (QPR Teil 1a, S. 214)</strong>
+        Zu prüfen ist, ob der ambulante Pflegedienst Anzeichen von Gewalt, Vernachlässigung oder Unterversorgung erkennt und ob er angemessen reagiert. Dies schließt sowohl die Fremdgefährdung der versorgten Person als auch Anzeichen von Selbstgefährdung ein.
+      </div>
+      <div class="leitfrage-block">
+        <div class="leitfrage-header" onclick="toggleLF(this)">
+          <span class="lf-nr">1.</span>
+          <span class="lf-frage">Werden Anzeichen von Gewalt, Vernachlässigung oder Unterversorgung wahrgenommen und dokumentiert?</span>
+          <span class="lf-pfeil">▼</span>
+        </div>
+        <div class="leitfrage-erlauterung">
+          <div class="erlauterung-label">Erläuterung (QPR Teil 1a, S. 215)</div>
+          Zu prüfen ist, ob der ambulante Pflegedienst Hinweise auf Gewalt (körperlich, psychisch, finanziell), Vernachlässigung oder Unterversorgung erkennt. Hinweise können sich aus der Inaugenscheinnahme der versorgten Person, aus dem Erscheinungsbild der Wohnsituation, aus Äußerungen der versorgten Person oder aus Beobachtungen im häuslichen Umfeld ergeben. Wichtig: Der ambulante Pflegedienst ist nicht für eine abschließende Beurteilung zuständig, wohl aber für das Erkennen und Weiterleiten solcher Anzeichen.
+        </div>
+      </div>
+      <div class="bemerkung-feld">
+        <label>Festgestellte Auffälligkeiten (kein A–D)</label>
+        <textarea id="bem-qa42" placeholder="Auffälligkeiten im Sinne des § 6.1 QPR Teil 1a …" oninput="setBewertung('qa42','offen',null); speichern()"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="aktions-leiste">
+    <button class="btn-sek" onclick="zeigeSection('qb3',document.querySelectorAll('.nav-btn')[2])">← QB 3</button>
+    <button class="btn-prim" onclick="zeigeSection('qb5',document.querySelectorAll('.nav-btn')[4])">Weiter zu QB 5 →</button>
+  </div>
+</div>
+
+<!-- ======================== QB 5 ======================== -->
+<div class="section" id="section-qb5">
+  <div class="qb-header">
+    <h2>Qualitätsbereich 5 · Qualitätsmanagement und Hygiene</h2>
+    <p>Prüfbogen B · Einrichtungsebene · Kriteriengestützte Bewertung: Anforderung erfüllt / nicht erfüllt</p>
+  </div>
+
+  <!-- 5.1 -->
+  <div class="qa-karte">
+    <div class="qa-titel" onclick="toggleQA('qa51')">
+      <span class="qa-nr">5.1</span>
+      <span class="qa-name">Internes Qualitätsmanagement und Behebung von Qualitätsdefiziten</span>
+      <span class="qa-bewertung-badge badge-leer" id="badge-qa51">–</span>
+      <span class="klapp-pfeil" id="pfeil-qa51">▼</span>
+    </div>
+    <div class="qa-inhalt" id="qa51">
+      <div class="allg-beschreibung">
+        <strong>Allgemeine Beschreibung (QPR Teil 1a, S. 264)</strong>
+        Zu prüfen ist, ob der ambulante Pflegedienst über ein funktionierendes internes Qualitätsmanagementsystem verfügt und ob erkannte Qualitätsdefizite systematisch behoben werden. Die kriteriengestützte Bewertung erfolgt auf Einrichtungsebene (Prüfbogen B).
+      </div>
+
+      <div class="kriterium-block">
+        <div class="kriterium-header" onclick="toggleKrit(this)">
+          <span class="krit-text">Es liegt ein einrichtungsinternes Qualitätsmanagementsystem vor, das die wesentlichen Arbeitsprozesse umfasst.</span>
+          <div class="ja-nein-toggle">
+            <button class="jn-btn" onclick="setKrit('k51a','ja',this);event.stopPropagation()">Ja</button>
+            <button class="jn-btn" onclick="setKrit('k51a','nein',this);event.stopPropagation()">Nein</button>
+          </div>
+          <span class="lf-pfeil" style="margin-left:8px;">▼</span>
+        </div>
+        <div class="krit-erlauterung">
+          <div class="erlauterung-label">Erläuterung (QPR Teil 1a, S. 265)</div>
+          Ein internes Qualitätsmanagementsystem umfasst die Beschreibung und Steuerung der wesentlichen Versorgungsprozesse. Dazu gehören u. a. Aufnahmeverfahren, Versorgungsplanung, Medikamentenmanagement, Notfallmanagement und Beschwerdemanagement. Die schriftliche Fixierung der Prozesse ist Voraussetzung für die Nachvollziehbarkeit und Überprüfbarkeit.
+        </div>
+      </div>
+
+      <div class="kriterium-block">
+        <div class="kriterium-header" onclick="toggleKrit(this)">
+          <span class="krit-text">Es ist ein Verfahren zur Erfassung und Behebung von Qualitätsdefiziten vorhanden und wird angewendet.</span>
+          <div class="ja-nein-toggle">
+            <button class="jn-btn" onclick="setKrit('k51b','ja',this);event.stopPropagation()">Ja</button>
+            <button class="jn-btn" onclick="setKrit('k51b','nein',this);event.stopPropagation()">Nein</button>
+          </div>
+          <span class="lf-pfeil" style="margin-left:8px;">▼</span>
+        </div>
+        <div class="krit-erlauterung">
+          <div class="erlauterung-label">Erläuterung (QPR Teil 1a, S. 265)</div>
+          Zu prüfen ist, ob der ambulante Pflegedienst über ein systematisches Verfahren zur Erfassung von Qualitätsdefiziten verfügt (z. B. Beschwerdemanagement, Fallbesprechungen, Auswertung von Zwischenfällen) und ob erkannte Defizite nachweislich behoben werden. Entscheidend ist die nachgewiesene Wirksamkeit des Systems, nicht allein sein Vorhandensein.
+        </div>
+      </div>
+
+      <div class="kriterium-block">
+        <div class="kriterium-header" onclick="toggleKrit(this)">
+          <span class="krit-text">Es sind aktuelle pflegefachliche Standards und Verfahrensanweisungen vorhanden und den Mitarbeiterinnen und Mitarbeitern bekannt.</span>
+          <div class="ja-nein-toggle">
+            <button class="jn-btn" onclick="setKrit('k51c','ja',this);event.stopPropagation()">Ja</button>
+            <button class="jn-btn" onclick="setKrit('k51c','nein',this);event.stopPropagation()">Nein</button>
+          </div>
+          <span class="lf-pfeil" style="margin-left:8px;">▼</span>
+        </div>
+        <div class="krit-erlauterung">
+          <div class="erlauterung-label">Erläuterung (QPR Teil 1a, S. 265)</div>
+          Der aktuelle Stand des Wissens (Expertenstandards des DNQP, einschlägige Leitlinien) muss in den einrichtungsinternen Standards und Verfahrensanweisungen abgebildet sein. Zu prüfen ist, ob diese den Mitarbeiterinnen und Mitarbeitern zugänglich sind und ob ihre Kenntnis im Fachgespräch nachvollzogen werden kann.
+        </div>
+      </div>
+
+      <div class="bemerkung-feld"><label>Bemerkungen zu QB 5.1</label><textarea id="bem-qa51" placeholder="Freitextfeld …" oninput="speichern()"></textarea></div>
+    </div>
+  </div>
+
+  <!-- 5.2 -->
+  <div class="qa-karte">
+    <div class="qa-titel" onclick="toggleQA('qa52')">
+      <span class="qa-nr">5.2</span>
+      <span class="qa-name">Hygiene</span>
+      <span class="qa-bewertung-badge badge-leer" id="badge-qa52">–</span>
+      <span class="klapp-pfeil" id="pfeil-qa52">▼</span>
+    </div>
+    <div class="qa-inhalt" id="qa52">
+      <div class="allg-beschreibung">
+        <strong>Allgemeine Beschreibung (QPR Teil 1a, S. 267)</strong>
+        Zu prüfen ist, ob der ambulante Pflegedienst die Hygieneanforderungen einhält, die für die erbrachten Leistungen relevant sind. Maßgeblich sind die aktuellen Empfehlungen der KRINKO nach § 23 Abs. 1 IfSG sowie einschlägige Rechtsvorschriften. Die Prüfung erfolgt auf Einrichtungsebene (Prüfbogen B).
+      </div>
+
+      <div class="kriterium-block">
+        <div class="kriterium-header" onclick="toggleKrit(this)">
+          <span class="krit-text">Es liegt ein einrichtungsinterner Hygieneplan vor, der die für den ambulanten Pflegedienst relevanten Hygieneanforderungen umfasst und aktuell ist.</span>
+          <div class="ja-nein-toggle">
+            <button class="jn-btn" onclick="setKrit('k52a','ja',this);event.stopPropagation()">Ja</button>
+            <button class="jn-btn" onclick="setKrit('k52a','nein',this);event.stopPropagation()">Nein</button>
+          </div>
+          <span class="lf-pfeil" style="margin-left:8px;">▼</span>
+        </div>
+        <div class="krit-erlauterung">
+          <div class="erlauterung-label">Erläuterung (QPR Teil 1a, S. 268)</div>
+          Der Hygieneplan muss die für den ambulanten Pflegedienst relevanten Hygienemaßnahmen umfassen (z. B. Händehygiene, Aufbereitung von Medizinprodukten, Umgang mit Körperflüssigkeiten, Isolation bei bestimmten Infektionskrankheiten, MRSA-Management). Er muss aktuell sein und dem aktuellen Stand der KRINKO-Empfehlungen entsprechen.
+        </div>
+      </div>
+
+      <div class="kriterium-block">
+        <div class="kriterium-header" onclick="toggleKrit(this)">
+          <span class="krit-text">Die Mitarbeiterinnen und Mitarbeiter wurden im Bereich Hygiene geschult; die Schulungen sind dokumentiert.</span>
+          <div class="ja-nein-toggle">
+            <button class="jn-btn" onclick="setKrit('k52b','ja',this);event.stopPropagation()">Ja</button>
+            <button class="jn-btn" onclick="setKrit('k52b','nein',this);event.stopPropagation()">Nein</button>
+          </div>
+          <span class="lf-pfeil" style="margin-left:8px;">▼</span>
+        </div>
+        <div class="krit-erlauterung">
+          <div class="erlauterung-label">Erläuterung (QPR Teil 1a, S. 268)</div>
+          Regelmäßige Hygieneschulungen für alle in der Versorgung tätigen Mitarbeiterinnen und Mitarbeiter sind Voraussetzung für die praktische Umsetzung des Hygieneplans. Zu prüfen ist, ob Schulungsnachweise vorliegen und ob die Schulungsinhalte dem aktuellen Stand der Hygieneanforderungen entsprechen. Auch die praktische Umsetzung (z. B. korrekte Händehygiene) kann im Fachgespräch und durch Beobachtung beurteilt werden.
+        </div>
+      </div>
+
+      <div class="bemerkung-feld"><label>Bemerkungen zu QB 5.2</label><textarea id="bem-qa52" placeholder="Freitextfeld …" oninput="speichern()"></textarea></div>
+    </div>
+  </div>
+
+  <div class="aktions-leiste">
+    <button class="btn-sek" onclick="zeigeSection('qb4',document.querySelectorAll('.nav-btn')[3])">← QB 4</button>
+    <button class="btn-prim" onclick="zeigeSection('export',document.querySelectorAll('.nav-btn')[5])">Zur Übersicht / Export →</button>
+  </div>
+</div>
+
+<!-- ======================== EXPORT ======================== -->
+<div class="section" id="section-export">
+  <div class="qb-header"><h2>Prüfübersicht und Export</h2><p>Zusammenfassung aller Bewertungen · Exportfunktion als JSON / Druck</p></div>
+  <div id="uebersicht-inhalt" style="background:#fff;border:1px solid var(--grau-rand);border-top:none;padding:22px;border-radius:0 0 var(--radius) var(--radius);font-size:0.88rem;"></div>
+  <div class="aktions-leiste" style="margin-top:14px;">
+    <button class="btn-sek" onclick="exportJSON()">⬇ JSON-Export</button>
+    <button class="btn-prim" onclick="window.print()">🖨 Drucken</button>
+    <button class="btn-rot" onclick="allesZuruecksetzen()">↺ Alle Eingaben löschen</button>
+  </div>
+</div>
+
+</main>
+
+<div id="toast"></div>
+
+<script>
+const bewertungen = {};
+const kriterien = {};
+
+function toggleQA(id) {
+  const el = document.getElementById(id);
+  const pfeil = document.getElementById('pfeil-' + id);
+  el.classList.toggle('offen');
+  pfeil.classList.toggle('auf');
+}
+
+function toggleLF(header) {
+  const erl = header.nextElementSibling;
+  const pfeil = header.querySelector('.lf-pfeil');
+  erl.classList.toggle('offen');
+  pfeil.classList.toggle('auf');
+}
+
+function toggleKrit(header) {
+  const erl = header.nextElementSibling;
+  const pfeil = header.querySelector('.lf-pfeil');
+  erl.classList.toggle('offen');
+  pfeil.classList.toggle('auf');
+}
+
+function setBewertung(qa, wert, btn) {
+  bewertungen[qa] = wert;
+  const badge = document.getElementById('badge-' + qa);
+  if (!badge) { speichern(); return; }
+  badge.textContent = wert || '–';
+  badge.className = 'qa-bewertung-badge';
+  if (wert === 'A') badge.classList.add('badge-a');
+  else if (wert === 'B') badge.classList.add('badge-b');
+  else if (wert === 'C') badge.classList.add('badge-c');
+  else if (wert === 'D') badge.classList.add('badge-d');
+  else badge.classList.add('badge-leer');
+
+  if (btn) {
+    const parent = btn.closest('.bewertung-optionen');
+    parent.querySelectorAll('.bew-btn').forEach(b => {
+      b.classList.remove('aktiv-a','aktiv-b','aktiv-c','aktiv-d');
+    });
+    if (wert === 'A') btn.classList.add('aktiv-a');
+    if (wert === 'B') btn.classList.add('aktiv-b');
+    if (wert === 'C') btn.classList.add('aktiv-c');
+    if (wert === 'D') btn.classList.add('aktiv-d');
+  }
+  aktualisiereBadges();
+  speichern();
+}
+
+function setKrit(id, wert, btn) {
+  kriterien[id] = wert;
+  const btns = btn.closest('.ja-nein-toggle').querySelectorAll('.jn-btn');
+  btns.forEach(b => { b.classList.remove('ja','nein'); });
+  btn.classList.add(wert);
+  aktualisiereBadges();
+  speichern();
+}
+
+function aktualisiereBadges() {
+  const qbMap = {
+    'qb1': ['qa11','qa12','qa13'],
+    'qb2': ['qa21','qa25','qa26'],
+    'qb3': ['qa3121','qa3128'],
+    'qb4': ['qa41','qa42'],
+    'qb5': ['qa51','qa52']
+  };
+  let gesamt = 0, max = 0;
+  Object.entries(qbMap).forEach(([qb, ids]) => {
+    const werte = ids.map(id => bewertungen[id]).filter(Boolean);
+    const badge = document.getElementById('badge-' + qb);
+    if (badge) badge.textContent = werte.length + '/' + ids.length;
+    gesamt += werte.length;
+    max += ids.length;
+  });
+  const pct = max > 0 ? Math.round(gesamt/max*100) : 0;
+  document.getElementById('fortschritt-fill').style.width = pct + '%';
+}
+
+function zeigeSection(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('aktiv'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('aktiv'));
+  document.getElementById('section-' + id).classList.add('aktiv');
+  if (btn) btn.classList.add('aktiv');
+  if (id === 'export') generiereUebersicht();
+}
+
+function generiereUebersicht() {
+  const pflegedienst = document.getElementById('pflegedienst').value || '–';
+  const pruefer = document.getElementById('pruefer').value || '–';
+  const datum = document.getElementById('pruef-datum').value || '–';
+  const art = document.getElementById('pruefart').value || '–';
+  const fall = document.getElementById('fall-id').value || '–';
+
+  const qaLabels = {
+    qa11: '1.1 Aufnahmemanagement',
+    qa12: '1.2 Erfassung/Reaktion Risiken',
+    qa13: '1.3 Erfassung/Reaktion Destabilisierung',
+    qa21: '2.1 Unterstützung Mobilität',
+    qa25: '2.5 Unterstützung Körperpflege',
+    qa26: '2.6 Unterstützung Nahrung/Flüssigkeit',
+    qa3121: '3.1.21 Medikamentengabe',
+    qa3128: '3.1.28 Wundversorgung (chronisch)',
+    qa41: '4.1 Zusammenarbeit An-/Zugehörige',
+    qa42: '4.2 Gewalt/Vernachlässigung/Unterversorgung',
+    qa51: '5.1 Internes QM',
+    qa52: '5.2 Hygiene'
+  };
+
+  let html = `<table style="width:100%;border-collapse:collapse;font-size:0.86rem;">
+  <tr style="background:#f0f2f6;"><th style="padding:8px 10px;text-align:left;border-bottom:2px solid #c8cfe0;" colspan="3">Prüfinformationen</th></tr>
+  <tr><td style="padding:6px 10px;border-bottom:1px solid #e8ecf4;color:#555;">Pflegedienst</td><td colspan="2" style="padding:6px 10px;border-bottom:1px solid #e8ecf4;font-weight:600;">${pflegedienst}</td></tr>
+  <tr><td style="padding:6px 10px;border-bottom:1px solid #e8ecf4;color:#555;">Prüfer/in</td><td colspan="2" style="padding:6px 10px;border-bottom:1px solid #e8ecf4;">${pruefer}</td></tr>
+  <tr><td style="padding:6px 10px;border-bottom:1px solid #e8ecf4;color:#555;">Datum / Prüfart</td><td colspan="2" style="padding:6px 10px;border-bottom:1px solid #e8ecf4;">${datum} · ${art}</td></tr>
+  <tr><td style="padding:6px 10px;border-bottom:2px solid #c8cfe0;color:#555;">Fall-ID</td><td colspan="2" style="padding:6px 10px;border-bottom:2px solid #c8cfe0;">${fall}</td></tr>
+  <tr style="background:#f0f2f6;"><th style="padding:8px 10px;text-align:left;border-bottom:1px solid #c8cfe0;">Qualitätsaspekt</th><th style="padding:8px 10px;text-align:center;border-bottom:1px solid #c8cfe0;">Bewertung</th><th style="padding:8px 10px;text-align:left;border-bottom:1px solid #c8cfe0;">Feststellungen (Auszug)</th></tr>`;
+
+  Object.entries(qaLabels).forEach(([qa, label]) => {
+    const bew = bewertungen[qa] || '–';
+    const bem = (document.getElementById('bem-' + qa)?.value || '').substring(0,80);
+    let farbe = '#888';
+    if (bew === 'A') farbe = '#1a7a4a';
+    if (bew === 'B') farbe = '#b85c00';
+    if (bew === 'C') farbe = '#856404';
+    if (bew === 'D') farbe = '#a01010';
+    html += `<tr style="border-bottom:1px solid #e8ecf4;">
+      <td style="padding:7px 10px;">${label}</td>
+      <td style="padding:7px 10px;text-align:center;font-weight:800;color:${farbe};">${bew}</td>
+      <td style="padding:7px 10px;color:#555;">${bem}${bem.length===80?'…':''}</td>
+    </tr>`;
+  });
+  html += '</table>';
+  document.getElementById('uebersicht-inhalt').innerHTML = html;
+}
+
+function exportJSON() {
+  const data = {
+    meta: {
+      pflegedienst: document.getElementById('pflegedienst').value,
+      pruefer: document.getElementById('pruefer').value,
+      datum: document.getElementById('pruef-datum').value,
+      pruefart: document.getElementById('pruefart').value,
+      fallId: document.getElementById('fall-id').value,
+      exportiert: new Date().toISOString()
+    },
+    bewertungen,
+    kriterien,
+    bemerkungen: {}
+  };
+  ['qa11','qa12','qa13','qa21','qa25','qa26','qa3121','qa3128','qa41','qa42','qa51','qa52'].forEach(id => {
+    const el = document.getElementById('bem-' + id);
+    if (el) data.bemerkungen[id] = el.value;
+  });
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'QPR_ambulante_Pflege_' + (data.meta.fallId || 'Export') + '_' + (data.meta.datum || new Date().toISOString().slice(0,10)) + '.json';
+  a.click();
+  toast('JSON-Export gespeichert');
+}
+
+function allesZuruecksetzen() {
+  if (!confirm('Alle Eingaben unwiderruflich löschen?')) return;
+  Object.keys(bewertungen).forEach(k => delete bewertungen[k]);
+  Object.keys(kriterien).forEach(k => delete kriterien[k]);
+  document.querySelectorAll('textarea').forEach(t => t.value = '');
+  document.querySelectorAll('input[type=text], input[type=date]').forEach(i => i.value = '');
+  document.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
+  document.querySelectorAll('.bew-btn').forEach(b => b.classList.remove('aktiv-a','aktiv-b','aktiv-c','aktiv-d'));
+  document.querySelectorAll('.jn-btn').forEach(b => b.classList.remove('ja','nein'));
+  document.querySelectorAll('.qa-bewertung-badge').forEach(b => { b.textContent = '–'; b.className = 'qa-bewertung-badge badge-leer'; });
+  document.querySelectorAll('.badge').forEach(b => { if (b.id.startsWith('badge-qb')) b.textContent = '—'; });
+  document.getElementById('fortschritt-fill').style.width = '0%';
+  localStorage.removeItem('qpr_ambulant_daten');
+  toast('Alle Eingaben gelöscht');
+}
+
+function speichern() {
+  const data = { bewertungen, kriterien, bemerkungen: {}, meta: {} };
+  ['pflegedienst','pruefer','pruef-datum','pruefart','fall-id'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) data.meta[id] = el.value;
+  });
+  ['qa11','qa12','qa13','qa21','qa25','qa26','qa3121','qa3128','qa41','qa42','qa51','qa52'].forEach(id => {
+    const el = document.getElementById('bem-' + id);
+    if (el) data.bemerkungen[id] = el.value;
+  });
+  try { localStorage.setItem('qpr_ambulant_daten', JSON.stringify(data)); } catch(e) {}
+}
+
+function laden() {
+  try {
+    const raw = localStorage.getItem('qpr_ambulant_daten');
+    if (!raw) return;
+    const data = JSON.parse(raw);
+    if (data.meta) {
+      Object.entries(data.meta).forEach(([id, val]) => {
+        const el = document.getElementById(id);
+        if (el) el.value = val;
+      });
+    }
+    if (data.bemerkungen) {
+      Object.entries(data.bemerkungen).forEach(([id, val]) => {
+        const el = document.getElementById('bem-' + id);
+        if (el) el.value = val;
+      });
+    }
+    if (data.bewertungen) {
+      Object.entries(data.bewertungen).forEach(([qa, wert]) => {
+        setBewertung(qa, wert, null);
+        const parent = document.querySelector('#' + qa + ' .bewertung-optionen');
+        if (parent) {
+          parent.querySelectorAll('.bew-btn').forEach(btn => {
+            if ((wert==='A'&&btn.classList.contains('a-btn'))||(wert==='B'&&btn.classList.contains('b-btn'))||(wert==='C'&&btn.classList.contains('c-btn'))||(wert==='D'&&btn.classList.contains('d-btn'))) {
+              btn.classList.add('aktiv-' + wert.toLowerCase());
+            }
+          });
+        }
+      });
+    }
+    if (data.kriterien) {
+      Object.entries(data.kriterien).forEach(([id, wert]) => {
+        kriterien[id] = wert;
+      });
+    }
+  } catch(e) {}
+}
+
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2400);
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  laden();
+  aktualisiereBadges();
+  document.querySelector('#pruef-datum').valueAsDate = new Date();
+});
+</script>
+</body>
+</html>
